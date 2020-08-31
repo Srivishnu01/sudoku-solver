@@ -1,11 +1,1 @@
 "Reinforcement learning"
-concept
-is 
-implemented
-here
-to
-achieve
-the goal
-of
-solving
-sudoku
