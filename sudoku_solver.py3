@@ -82,7 +82,7 @@ class suduko:
 game=[[int(x) for x in list(input())] for i in range(9)]
 print(suduko(game))
 
-'''
+'''input
 950000800
 000701000
 200000000
