@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Puzzle</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+
+        td {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            border: 1px solid #000;
+            font-size: 21px;
+        }
+        td:hover {
+            background-color: #c7ffd8;
+        }
+        td.has-value {
+            background-color: #c0c8d1;
+            font-weight: bold;
+        }
+
+        input {
+            width: 50px;
+            height: 50px;
+            border: none;
+            font-size: 21px;
+            text-align: center;
+            background-color: inherit;
+        }
+        .buttons
+        {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Simple 9X9 Sudoku Puzzle</h1>
+
+    <table id = "puzzle_9_9">
+    </table>
+    <h3 id="output_msg"></h3>
+    <div class="buttons">
+        <button onclick="solvePuzzle()">Solve</button>
+        <button onclick="resetPuzzle()">Reset</button>
+    </div>
+
+    <script>
+        var table = document.getElementById("puzzle_9_9");
+        for(let i = 0; i < 9; i++)
+        {
+            let row = table.insertRow(i);
+            for(let j = 0; j < 9; j++)
+            {
+                let cell = row.insertCell(j);
+                row_col = (i*9+j).toString();
+                cell.innerHTML = "<input type='number' id = "+row_col+" min=1 max=9>";
+            }
+        }
+        function solvePuzzle() {
+            // alert("Solving the puzzle!");
+            let rows = [];
+            for(let i=0; i<9; i++)
+            {
+                let row = [];
+                for(let j=0; j<9; j++)
+                {
+                    let v = document.getElementById((i*9+j).toString()).value;
+                    row.push(v?parseInt(v):0);
+                }
+                rows.push(row);
+            }
+
+            // alert(rows[1]);
+             function makeHttpRequest(payload) {
+
+            const apiUrl = 'http://127.0.0.1:5000/solve-9-cross-9-sudoku';
+
+            fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data received:', data);
+                    if(data["success"] == true)
+                    for(let i=0; i<9; i++)
+                    {
+                        let row = data["solution"][i];
+                        for(let j=0; j<9; j++)
+                        {
+                            let field = document.getElementById((i*9+j).toString());
+                            field.value = row[j];
+                        }
+                    }
+                    document.getElementById("output_msg").innerHTML = data["message"];
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+            }
+            makeHttpRequest({"game":rows});
+
+
+        }
+
+        function resetPuzzle() {
+            const inputs = document.querySelectorAll('td input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+
+            const cells = document.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.classList.remove('has-value');
+            });
+
+
+        }
+        document.addEventListener('input', function (event) {
+            const target = event.target;
+            if (target.tagName.toLowerCase() === 'input') {
+                const td = target.parentNode;
+                const inputValue = parseInt(target.value, 10);
+
+            if (!isNaN(inputValue) && inputValue >= 1 && inputValue <= 9) {
+                td.classList.add('has-value');
+            } else {
+                    td.classList.remove('has-value');
+                    target.value = "";
+                }
+            }
+        });
+    </script>
+
+
+
+</body>
+</html>
